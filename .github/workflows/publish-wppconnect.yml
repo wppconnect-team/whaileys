@@ -1,0 +1,60 @@
+name: Publish @wppconnect/whaileys
+
+# Publishes this fork to npm as @wppconnect/whaileys.
+#
+# The fork's package.json keeps the upstream name ("whaileys") so the branch
+# stays a faithful mirror and is trivial to sync. The scoped name is applied
+# ONLY here in the runner, right before publishing — never committed.
+#
+# Trigger: push a tag like `wpp-v6.4.14` (own prefix, never collides with the
+# upstream's `v*` tags).
+#
+# Auth: OIDC trusted publishing (same model as wppconnect-team/wppconnect).
+# Configure a trusted publisher for @wppconnect/whaileys in npm pointing at this
+# workflow. No NPM_TOKEN secret needed.
+
+on:
+  push:
+    tags:
+      - 'wpp-v*'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: npm ci || npm install
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: true
+
+      - name: Build
+        run: npm run build:all
+
+      - name: Apply @wppconnect scope (runner only, not committed)
+        run: |
+          VERSION="${GITHUB_REF_NAME#wpp-v}"
+          npm pkg set name='@wppconnect/whaileys'
+          npm pkg set version="${VERSION}"
+          npm pkg set 'publishConfig.access'='public'
+          echo "Publishing @wppconnect/whaileys@${VERSION}"
+
+      - name: Publish to npm
+        run: |
+          if [[ "${GITHUB_REF_NAME}" == *"-alpha"* || "${GITHUB_REF_NAME}" == *"-rc"* || "${GITHUB_REF_NAME}" == *"-beta"* ]]; then
+            npm publish --provenance --access public --tag next
+          else
+            npm publish --provenance --access public
+          fi
