@@ -12,11 +12,10 @@ Published to npm as **`@wppconnect/whaileys`** from the **`publish`** branch via
 Keep `publish` rebased on `main`; the only diff should be those `package.json`
 fields.
 
-## First publish (trusted publishing)
+## First publish (manual, then trusted publishing)
 
-Create the trusted publisher relationship once. This authorizes the GitHub
-Actions workflow to create and publish this package without a long-lived npm
-token:
+Create the package once with an interactive publish. This uses the npm account's
+2FA and does not require a long-lived CI token:
 
 ```bash
 git fetch origin
@@ -25,6 +24,14 @@ npm ci || npm install
 npm run build:all
 
 npm login                 # account with rights on the @wppconnect scope
+npm publish --access public
+```
+
+After the package exists, create the trusted publisher relationship. This
+authorizes the GitHub Actions workflow to publish future versions without an npm
+token:
+
+```bash
 npm trust github @wppconnect/whaileys \
   --repo wppconnect-team/whaileys \
   --file publish-wppconnect.yml \
