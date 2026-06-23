@@ -1,6 +1,6 @@
 name: Publish @wppconnect/whaileys
 
-# Publishes this fork to npm as @wppconnect/whaileys via OIDC trusted publishing.
+# Publishes this fork to npm as @wppconnect/whaileys from the publish branch.
 #
 # WHY A `publish` BRANCH:
 # The default branch (main) stays a faithful mirror of upstream (canove/whaileys)
@@ -8,10 +8,7 @@ name: Publish @wppconnect/whaileys
 # package.json carries the scoped name + the fork's repository url — which OIDC
 # provenance REQUIRES to match the GitHub repo.
 #
-# FIRST PUBLISH IS MANUAL (see PUBLISHING.md). After the package exists on npm
-# and its Trusted Publisher is configured, pushing to `publish` publishes.
-#
-# Auth: OIDC trusted publishing — no NPM_TOKEN secret needed.
+# Auth: GitHub Actions secret NPM_TOKEN.
 
 on:
   push:
@@ -20,7 +17,6 @@ on:
   workflow_dispatch:
 
 permissions:
-  id-token: write
   contents: read
 
 jobs:
@@ -36,7 +32,7 @@ jobs:
           node-version: 22.14.0
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Update npm (>= 11.5.1 required for trusted publishing)
+      - name: Update npm
         run: npm install -g npm@latest
 
       - name: Install dependencies
@@ -47,12 +43,14 @@ jobs:
       - name: Build
         run: npm run build:all
 
-      - name: Publish to npm (OIDC)
+      - name: Publish to npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           NAME=$(node -p "require('./package.json').name")
           VERSION=$(node -p "require('./package.json').version")
           if npm view "$NAME@$VERSION" version >/dev/null 2>&1; then
             echo "$NAME@$VERSION already published, skipping."
           else
-            npm publish
+            npm publish --access public
           fi
