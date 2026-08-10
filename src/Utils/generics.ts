@@ -1,6 +1,7 @@
 import { Boom } from "@hapi/boom";
 import axios, { AxiosRequestConfig } from "axios";
 import { createHash, randomBytes } from "crypto";
+import Long from "long";
 import { platform, release } from "os";
 import { Logger } from "pino";
 import { proto } from "../../WAProto";

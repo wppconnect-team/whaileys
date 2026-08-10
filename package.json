@@ -40,6 +40,7 @@
     "futoin-hkdf": "^1.5.0",
     "libsignal": "github:canove/libsignal-node#105ad38dc8d7668b5d5e3688e710915bef5cdc7f",
     "lodash": "^4.17.21",
+    "long": "^5.3.2",
     "music-metadata": "^7.12.3",
     "node-cache": "^5.1.2",
     "ogg-opus-decoder": "^1.7.1",
@@ -71,6 +72,9 @@
     "link-preview-js": {
       "optional": true
     }
+  },
+  "overrides": {
+    "protobufjs": "$protobufjs"
   },
   "files": [
     "lib/*",

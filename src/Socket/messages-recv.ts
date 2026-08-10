@@ -1,4 +1,5 @@
 import { Boom } from "@hapi/boom";
+import Long from "long";
 import { proto } from "../../WAProto";
 import { KEY_BUNDLE_TYPE, MIN_PREKEY_COUNT } from "../Defaults";
 import {
