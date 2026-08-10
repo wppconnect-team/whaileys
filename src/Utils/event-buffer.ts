@@ -378,14 +378,14 @@ function append<E extends BufferableEvent>(
         }
 
         if (upsert) {
-          upsert = Object.assign(upsert, trimUndefineds(contact));
+          Object.assign(upsert, trimUndefineds(contact));
         } else {
           upsert = contact;
           data.contactUpserts[contact.id] = upsert;
         }
 
         if (data.contactUpdates[contact.id]) {
-          upsert = Object.assign(
+          Object.assign(
             data.contactUpdates[contact.id],
             trimUndefineds(contact)
           );
