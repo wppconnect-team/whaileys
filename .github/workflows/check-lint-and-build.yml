@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: write
+      contents: read
 
     steps:
       - name: 📥 Checkout Commit
@@ -28,3 +28,6 @@ jobs:
 
       - name: 🏗️ Build project
         run: npm run build:tsc
+
+      - name: 🧪 Test protobuf extractor HTTP client
+        run: npm test --prefix proto-extract

@@ -1,7 +1,7 @@
-const request = require("request-promise-native");
 const acorn = require("acorn");
 const walk = require("acorn-walk");
 const fs = require("fs/promises");
+const { getText } = require("./http-get");
 
 let whatsAppVersion = "latest";
 
@@ -53,7 +53,7 @@ async function findAppModules() {
     }
   };
   const baseURL = "https://web.whatsapp.com";
-  const serviceworker = await request.get(`${baseURL}/sw.js`, ua);
+  const serviceworker = await getText(`${baseURL}/sw.js`, ua);
 
   const versions = [
     ...serviceworker.matchAll(/client_revision\\":([\d\.]+),/g)
@@ -73,7 +73,7 @@ async function findAppModules() {
 
   console.info("Found source JS URL:", bootstrapQRURL);
 
-  const qrData = await request.get(bootstrapQRURL, ua);
+  const qrData = await getText(bootstrapQRURL, ua);
 
   // This one list of types is so long that it's split into two JavaScript declarations.
   // The module finder below can't handle it, so just patch it manually here.
