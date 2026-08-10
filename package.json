@@ -94,7 +94,7 @@
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^9.1.2",
     "eslint-plugin-prettier": "^5.5.4",
-    "jest": "^27.0.6",
+    "jest": "^30.4.2",
     "jimp": "^0.16.1",
     "link-preview-js": "^2.1.13",
     "prettier": "^3.6.2",
