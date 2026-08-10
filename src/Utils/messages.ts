@@ -3,12 +3,7 @@ import axios from "axios";
 import { createReadStream, promises as fs } from "fs";
 import { Logger } from "pino";
 import { proto } from "../../WAProto";
-import {
-  MEDIA_KEYS,
-  URL_EXCLUDE_REGEX,
-  URL_REGEX,
-  WA_DEFAULT_EPHEMERAL
-} from "../Defaults";
+import { MEDIA_KEYS, WA_DEFAULT_EPHEMERAL } from "../Defaults";
 import {
   AnyMediaMessageContent,
   AnyMessageContent,
@@ -81,8 +76,37 @@ const ButtonType = proto.Message.ButtonsMessage.HeaderType;
  * @param text eg. hello https://google.com
  * @returns the URL, eg. https://google.com
  */
-export const extractUrlFromText = (text: string) =>
-  !URL_EXCLUDE_REGEX.test(text) ? text.match(URL_REGEX)?.[0] : undefined;
+export const extractUrlFromText = (text: string) => {
+  if (text.includes("@")) {
+    return;
+  }
+
+  const surroundingPunctuation = "()[]{}<>,.!?;:'\"";
+  for (const rawToken of text.split(/\s+/)) {
+    let start = 0;
+    let end = rawToken.length;
+    while (start < end && surroundingPunctuation.includes(rawToken[start]!))
+      start++;
+    while (end > start && surroundingPunctuation.includes(rawToken[end - 1]!))
+      end--;
+    const token = rawToken.slice(start, end);
+    if (!token) continue;
+
+    try {
+      const parsed = new URL(
+        token.includes("://") ? token : `https://${token}`
+      );
+      if (
+        (parsed.protocol === "http:" || parsed.protocol === "https:") &&
+        parsed.hostname.includes(".")
+      ) {
+        return token;
+      }
+    } catch {
+      // Continue looking for another URL-like token.
+    }
+  }
+};
 
 export const generateLinkPreviewIfRequired = async (
   text: string,

@@ -13,6 +13,11 @@ import { Curve, signedKeyPair } from "./crypto";
 import { delay, generateRegistrationId } from "./generics";
 import { DEFAULT_CACHE_TTLS } from "../Defaults";
 
+const makeSignalDataSet = (): SignalDataSet =>
+  Object.create(null) as SignalDataSet;
+const makeSignalDataMap = <T>(): Record<string, T> =>
+  Object.create(null) as Record<string, T>;
+
 /**
  * Adds caching capability to a SignalKeyStore
  * @param store the store to add caching to
@@ -38,7 +43,8 @@ export function makeCacheableSignalKeyStore(
 
   return {
     async get(type, ids) {
-      const data: { [_: string]: SignalDataTypeMap[typeof type] } = {};
+      const data: { [_: string]: SignalDataTypeMap[typeof type] } =
+        makeSignalDataMap();
       const idsToFetch: string[] = [];
       for (const id of ids) {
         const item = cache.get<SignalDataTypeMap[typeof type]>(
@@ -101,8 +107,8 @@ export const addTransactionCapability = (
   // number of queries made to the DB during the transaction
   // only there for logging purposes
   let dbQueriesInTransaction = 0;
-  let transactionCache: SignalDataSet = {};
-  let mutations: SignalDataSet = {};
+  let transactionCache: SignalDataSet = makeSignalDataSet();
+  let mutations: SignalDataSet = makeSignalDataSet();
 
   /**
    * prefetches some data and stores in memory,
@@ -117,7 +123,7 @@ export const addTransactionCapability = (
       const result = await state.get(type, idsRequiringFetch);
 
       transactionCache[type] = Object.assign(
-        transactionCache[type] || {},
+        transactionCache[type] || makeSignalDataMap(),
         result
       );
     }
@@ -134,7 +140,7 @@ export const addTransactionCapability = (
           }
 
           return dict;
-        }, {});
+        }, makeSignalDataMap());
       } else {
         return state.get(type, ids);
       }
@@ -143,10 +149,10 @@ export const addTransactionCapability = (
       if (inTransaction) {
         logger.trace({ types: Object.keys(data) }, "caching in transaction");
         for (const key in data) {
-          transactionCache[key] = transactionCache[key] || {};
+          transactionCache[key] = transactionCache[key] || makeSignalDataMap();
           Object.assign(transactionCache[key], data[key]);
 
-          mutations[key] = mutations[key] || {};
+          mutations[key] = mutations[key] || makeSignalDataMap();
           Object.assign(mutations[key], data[key]);
         }
       } else {
@@ -192,8 +198,8 @@ export const addTransactionCapability = (
           }
         } finally {
           inTransaction = false;
-          transactionCache = {};
-          mutations = {};
+          transactionCache = makeSignalDataSet();
+          mutations = makeSignalDataSet();
           dbQueriesInTransaction = 0;
         }
       }

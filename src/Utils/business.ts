@@ -254,8 +254,16 @@ export const uploadingNecessaryImages = async (
     images.map<Promise<{ url: string }>>(async img => {
       if ("url" in img) {
         const url = img.url.toString();
-        if (url.includes(".whatsapp.net")) {
-          return { url };
+        try {
+          const hostname = new URL(url).hostname.toLowerCase();
+          if (
+            hostname === "whatsapp.net" ||
+            hostname.endsWith(".whatsapp.net")
+          ) {
+            return { url };
+          }
+        } catch {
+          // Invalid URLs are handled by getStream below.
         }
       }
 

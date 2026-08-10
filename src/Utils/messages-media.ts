@@ -1,6 +1,6 @@
 import { Boom } from "@hapi/boom";
 import { AxiosRequestConfig } from "axios";
-import { exec } from "child_process";
+import { execFile } from "child_process";
 import * as Crypto from "crypto";
 import { once } from "events";
 import {
@@ -104,14 +104,30 @@ const extractVideoThumb = async (
   size: { width: number; height: number }
 ) =>
   new Promise((resolve, reject) => {
-    const cmd = `ffmpeg -ss ${time} -i ${path} -y -vf scale=${size.width}:-1 -vframes 1 -f image2 ${destPath}`;
-    exec(cmd, err => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve();
+    execFile(
+      "ffmpeg",
+      [
+        "-ss",
+        time,
+        "-i",
+        path,
+        "-y",
+        "-vf",
+        `scale=${size.width}:-1`,
+        "-vframes",
+        "1",
+        "-f",
+        "image2",
+        destPath
+      ],
+      err => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
       }
-    });
+    );
   }) as Promise<void>;
 
 export const extractImageThumb = async (
@@ -154,10 +170,15 @@ export const extractImageThumb = async (
   }
 };
 
-export const encodeBase64EncodedStringForUpload = (b64: string) =>
-  encodeURIComponent(
-    b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/\=+$/, "")
+export const encodeBase64EncodedStringForUpload = (b64: string) => {
+  let unpaddedLength = b64.length;
+  while (unpaddedLength > 0 && b64[unpaddedLength - 1] === "=") {
+    unpaddedLength--;
+  }
+  return encodeURIComponent(
+    b64.slice(0, unpaddedLength).replace(/\+/g, "-").replace(/\//g, "_")
   );
+};
 
 export const generateProfilePicture = async (mediaUpload: WAMediaUpload) => {
   let bufferOrFilePath: Buffer | string;
