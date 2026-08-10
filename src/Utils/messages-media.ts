@@ -41,7 +41,7 @@ import {
   jidNormalizedUser
 } from "../WABinary";
 import { aesDecryptGCM, aesEncryptGCM, hkdf } from "./crypto";
-import { generateMessageID } from "./generics";
+import { generateMessageID, toPlainStringHeaders } from "./generics";
 
 const getTmpFilesDirectory = () => tmpdir();
 
@@ -568,7 +568,7 @@ export const downloadEncryptedContent = async (
     : undefined;
 
   const headers: { [_: string]: string } = {
-    ...(options?.headers || {}),
+    ...toPlainStringHeaders(options?.headers),
     Origin: DEFAULT_ORIGIN
   };
   if (startChunk || endChunk) {

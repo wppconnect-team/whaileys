@@ -31,7 +31,8 @@ import {
   getNextPreKeysNode,
   makeNoiseHandler,
   printQRIfNecessaryListener,
-  promiseTimeout
+  promiseTimeout,
+  toPlainStringHeaders
 } from "../Utils";
 import { makeEventBuffer } from "../Utils/event-buffer";
 import {
@@ -71,7 +72,7 @@ export const makeSocket = ({
 }: SocketConfig) => {
   const ws = new WebSocket(waWebSocketUrl, undefined, {
     origin: DEFAULT_ORIGIN,
-    headers: options.headers,
+    headers: toPlainStringHeaders(options.headers),
     handshakeTimeout: connectTimeoutMs,
     timeout: connectTimeoutMs,
     agent

@@ -475,6 +475,24 @@ export function trimUndefineds(obj: any) {
   return obj;
 }
 
+export const toPlainStringHeaders = (
+  headers?: AxiosRequestConfig["headers"]
+): Record<string, string> =>
+  Object.entries(headers || {}).reduce<Record<string, string>>(
+    (normalized, [name, value]) => {
+      if (typeof value === "string") {
+        normalized[name] = value;
+      } else if (typeof value === "number" || typeof value === "boolean") {
+        normalized[name] = String(value);
+      } else if (Array.isArray(value)) {
+        normalized[name] = value.join(", ");
+      }
+
+      return normalized;
+    },
+    {}
+  );
+
 export function bytesToCrockford(buffer: Buffer): string {
   const CROCKFORD_CHARACTERS = "123456789ABCDEFGHJKLMNPQRSTVWXYZ";
 
