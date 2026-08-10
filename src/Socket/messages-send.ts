@@ -47,7 +47,6 @@ import {
   isJidGroup,
   isJidStatusBroadcast,
   isJidUser,
-  isLidUser,
   jidDecode,
   jidEncode,
   jidNormalizedUser,

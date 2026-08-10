@@ -1,6 +1,4 @@
-import NodeCache from "node-cache";
 import { proto } from "../../WAProto";
-import { DEFAULT_CACHE_TTLS } from "../Defaults";
 import {
   GroupMetadata,
   ParticipantAction,

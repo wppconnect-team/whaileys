@@ -370,7 +370,7 @@ export const encryptedStream = async (
   saveOriginalFileIfRequired = true,
   logger?: Logger
 ) => {
-  const { stream, type } = await getStream(media);
+  const { stream } = await getStream(media);
 
   logger?.debug("fetched media stream");
 
