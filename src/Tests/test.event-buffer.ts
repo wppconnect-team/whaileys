@@ -24,6 +24,18 @@ describe("Event Buffer Tests", () => {
     ev = makeEventBuffer(_logger);
   });
 
+  it("buffers untrusted IDs without modifying object prototypes", async () => {
+    const contacts: Array<{ id: string; name?: string }> = [];
+    ev.on("contacts.upsert", value => contacts.push(...value));
+
+    ev.buffer();
+    ev.emit("contacts.upsert", [{ id: "__proto__", name: "safe value" }]);
+    await ev.flush();
+
+    expect(contacts).toEqual([{ id: "__proto__", name: "safe value" }]);
+    expect(Object.prototype).not.toHaveProperty("name");
+  });
+
   it("should buffer a chat upsert & update event", async () => {
     const chatId = randomJid();
 

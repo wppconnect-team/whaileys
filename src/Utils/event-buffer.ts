@@ -47,6 +47,9 @@ type BaileysEventData = Partial<BaileysEventMap>;
 
 const BUFFERABLE_EVENT_SET = new Set<BaileysEvent>(BUFFERABLE_EVENT);
 
+const makeRecord = <T>(): Record<string, T> =>
+  Object.create(null) as Record<string, T>;
+
 type BaileysBufferableEventEmitter = BaileysEventEmitter & {
   /** Use to process events in a batch */
   process(
@@ -166,7 +169,7 @@ export const makeEventBuffer = (
               }
             });
             // Clear the message upserts from the buffer
-            data.messageUpserts = {};
+            data.messageUpserts = makeRecord();
           }
         }
       }
@@ -207,23 +210,23 @@ export const makeEventBuffer = (
 const makeBufferData = (): BufferedEventData => {
   return {
     historySets: {
-      chats: {},
-      messages: {},
-      contacts: {},
+      chats: makeRecord(),
+      messages: makeRecord(),
+      contacts: makeRecord(),
       isLatest: false,
       empty: true
     },
-    chatUpserts: {},
-    chatUpdates: {},
+    chatUpserts: makeRecord(),
+    chatUpdates: makeRecord(),
     chatDeletes: new Set(),
-    contactUpserts: {},
-    contactUpdates: {},
-    messageUpserts: {},
-    messageUpdates: {},
-    messageReactions: {},
-    messageDeletes: {},
-    messageReceipts: {},
-    groupUpdates: {}
+    contactUpserts: makeRecord(),
+    contactUpdates: makeRecord(),
+    messageUpserts: makeRecord(),
+    messageUpdates: makeRecord(),
+    messageReactions: makeRecord(),
+    messageDeletes: makeRecord(),
+    messageReceipts: makeRecord(),
+    groupUpdates: makeRecord()
   };
 };
 
@@ -582,7 +585,7 @@ function append<E extends BufferableEvent>(
 }
 
 function consolidateEvents(data: BufferedEventData) {
-  const map: BaileysEventData = {};
+  const map: BaileysEventData = Object.create(null) as BaileysEventData;
 
   if (!data.historySets.empty) {
     map["messaging-history.set"] = {
