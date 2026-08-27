@@ -1,6 +1,6 @@
 import { Boom } from "@hapi/boom";
 import axios from "axios";
-import { createReadStream, promises as fs } from "fs";
+import { promises as fs } from "fs";
 import { Logger } from "pino";
 import { proto } from "../../WAProto";
 import { MEDIA_KEYS, WA_DEFAULT_EPHEMERAL } from "../Defaults";
@@ -29,7 +29,6 @@ import { generateMessageIDV2, unixTimestampSeconds } from "./generics";
 import {
   downloadContentFromMessage,
   encryptedStream,
-  generateThumbnail,
   getAudioDuration,
   getAudioWaveform,
   MediaDownloadOptions
@@ -811,13 +810,11 @@ export function getAggregateVotesInPollMessage({
 
     for (const option of vote.selectedOptions || []) {
       const hash = option.toString();
-      let data = voteHashMap[hash];
-      if (!data) {
+      if (!voteHashMap[hash]) {
         voteHashMap[hash] = {
           name: "Unknown",
           voters: []
         };
-        data = voteHashMap[hash];
       }
 
       voteHashMap[hash]!.voters.push(getKeyAuthor(update.pollUpdateMessageKey));
@@ -959,14 +956,6 @@ export const assertMediaContent = (
   }
 
   return mediaContent;
-};
-
-const generateContextInfo = () => {
-  const info: proto.IMessageContextInfo = {
-    deviceListMetadataVersion: 2,
-    deviceListMetadata: {}
-  };
-  return info;
 };
 
 /**

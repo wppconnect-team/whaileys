@@ -46,24 +46,10 @@ import { generateMessageID, toPlainStringHeaders } from "./generics";
 const getTmpFilesDirectory = () => tmpdir();
 
 const getImageProcessingLibrary = async () => {
-  const [_jimp, sharp] = await Promise.all([
-    (async () => {
-      const jimp = await import("jimp").catch(() => {});
-      return jimp;
-    })(),
-    (async () => {
-      const sharp = await import("sharp").catch(() => {});
-      return sharp;
-    })()
-  ]);
+  const sharp = await import("sharp").catch(() => {});
 
   if (sharp) {
     return { sharp };
-  }
-
-  const jimp = _jimp?.default || _jimp;
-  if (jimp) {
-    return { jimp };
   }
 
   throw new Boom("No image processing library available");
@@ -139,35 +125,17 @@ export const extractImageThumb = async (
   }
 
   const lib = await getImageProcessingLibrary();
-  if ("sharp" in lib) {
-    const img = lib.sharp!.default(bufferOrFilePath);
-    const dimensions = await img.metadata();
+  const img = lib.sharp.default(bufferOrFilePath);
+  const dimensions = await img.metadata();
 
-    const buffer = await img.resize(width).jpeg({ quality: 50 }).toBuffer();
-    return {
-      buffer,
-      original: {
-        width: dimensions.width,
-        height: dimensions.height
-      }
-    };
-  } else {
-    const { read, MIME_JPEG, RESIZE_BILINEAR, AUTO } = lib.jimp;
-
-    const jimp = await read(bufferOrFilePath as any);
-    const dimensions = {
-      width: jimp.getWidth(),
-      height: jimp.getHeight()
-    };
-    const buffer = await jimp
-      .quality(50)
-      .resize(width, AUTO, RESIZE_BILINEAR)
-      .getBufferAsync(MIME_JPEG);
-    return {
-      buffer,
-      original: dimensions
-    };
-  }
+  const buffer = await img.resize(width).jpeg({ quality: 50 }).toBuffer();
+  return {
+    buffer,
+    original: {
+      width: dimensions.width,
+      height: dimensions.height
+    }
+  };
 };
 
 export const encodeBase64EncodedStringForUpload = (b64: string) => {
@@ -191,26 +159,13 @@ export const generateProfilePicture = async (mediaUpload: WAMediaUpload) => {
   }
 
   const lib = await getImageProcessingLibrary();
-  let img: Promise<Buffer>;
-  if ("sharp" in lib) {
-    img = lib
-      .sharp!.default(bufferOrFilePath)
-      .resize(640, 640)
-      .jpeg({
-        quality: 50
-      })
-      .toBuffer();
-  } else {
-    const { read, MIME_JPEG, RESIZE_BILINEAR } = lib.jimp;
-    const jimp = await read(bufferOrFilePath as any);
-    const min = Math.min(jimp.getWidth(), jimp.getHeight());
-    const cropped = jimp.crop(0, 0, min, min);
-
-    img = cropped
-      .quality(50)
-      .resize(640, 640, RESIZE_BILINEAR)
-      .getBufferAsync(MIME_JPEG);
-  }
+  const img = lib.sharp
+    .default(bufferOrFilePath)
+    .resize(640, 640)
+    .jpeg({
+      quality: 50
+    })
+    .toBuffer();
 
   return {
     img: await img
@@ -415,7 +370,7 @@ export const encryptedStream = async (
   saveOriginalFileIfRequired = true,
   logger?: Logger
 ) => {
-  const { stream, type } = await getStream(media);
+  const { stream } = await getStream(media);
 
   logger?.debug("fetched media stream");
 
@@ -554,7 +509,7 @@ export const downloadEncryptedContent = async (
   let firstBlockIsIV = false;
   // if a start byte is specified -- then we need to fetch the previous chunk as that will form the IV
   if (startByte) {
-    const chunk = toSmallestChunkSize(startByte || 0);
+    const chunk = toSmallestChunkSize(startByte);
     if (chunk) {
       startChunk = chunk - AES_CHUNK_SIZE;
       bytesFetched = chunk;
@@ -564,7 +519,7 @@ export const downloadEncryptedContent = async (
   }
 
   const endChunk = endByte
-    ? toSmallestChunkSize(endByte || 0) + AES_CHUNK_SIZE
+    ? toSmallestChunkSize(endByte) + AES_CHUNK_SIZE
     : undefined;
 
   const headers: { [_: string]: string } = {

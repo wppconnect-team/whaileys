@@ -8,7 +8,6 @@ import {
   MessageUserReceipt,
   SocketConfig,
   WACallEvent,
-  WAMessage,
   WAMessageKey,
   WAMessageStubType,
   WAPatchName
@@ -46,7 +45,6 @@ import {
   getBinaryNodeChildBuffer,
   getBinaryNodeChildren,
   isJidGroup,
-  isJidMetaAI,
   isJidUser,
   jidDecode,
   jidNormalizedUser,
@@ -74,7 +72,6 @@ export const makeMessagesRecvSocket = (config: SocketConfig) => {
     upsertMessage,
     resyncAppState,
     onUnexpectedError,
-    assertSessions,
     sendNode,
     relayMessage,
     sendReceipt,

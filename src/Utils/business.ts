@@ -20,7 +20,7 @@ import {
   getBinaryNodeChildren,
   getBinaryNodeChildString
 } from "../WABinary";
-import { getStream, getUrlFromDirectPath, toReadable } from "./messages-media";
+import { getStream, getUrlFromDirectPath } from "./messages-media";
 import { generateMessageIDV2 } from "./generics";
 
 export const parseCatalogNode = (node: BinaryNode) => {

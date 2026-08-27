@@ -1,6 +1,11 @@
+import sharp from "sharp";
 import { toPlainStringHeaders } from "../Utils/generics";
 import { extractUrlFromText } from "../Utils/messages";
-import { encodeBase64EncodedStringForUpload } from "../Utils/messages-media";
+import {
+  encodeBase64EncodedStringForUpload,
+  extractImageThumb,
+  generateProfilePicture
+} from "../Utils/messages-media";
 
 describe("security utility regressions", () => {
   it("extracts URL tokens without a backtracking URL regex", () => {
@@ -31,6 +36,30 @@ describe("security utility regressions", () => {
       "X-Retry": "2",
       "X-Enabled": "true",
       Accept: "application/json, text/plain"
+    });
+  });
+
+  it("processes thumbnails and profile pictures with the patched Sharp path", async () => {
+    const source = await sharp({
+      create: {
+        width: 64,
+        height: 32,
+        channels: 3,
+        background: "#336699"
+      }
+    })
+      .png()
+      .toBuffer();
+
+    const thumbnail = await extractImageThumb(source, 16);
+    expect(thumbnail.original).toEqual({ width: 64, height: 32 });
+    expect((await sharp(thumbnail.buffer).metadata()).width).toBe(16);
+
+    const profile = await generateProfilePicture(source);
+    expect(await sharp(profile.img).metadata()).toMatchObject({
+      width: 640,
+      height: 640,
+      format: "jpeg"
     });
   });
 });

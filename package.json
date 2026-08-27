@@ -41,7 +41,7 @@
     "libsignal": "github:canove/libsignal-node#105ad38dc8d7668b5d5e3688e710915bef5cdc7f",
     "lodash": "^4.17.21",
     "long": "^5.3.2",
-    "music-metadata": "^7.12.3",
+    "music-metadata": "^11.14.0",
     "node-cache": "^5.1.2",
     "ogg-opus-decoder": "^1.7.1",
     "pino": "^7.0.0",
@@ -51,16 +51,12 @@
   },
   "peerDependencies": {
     "@adiwajshing/keyed-db": "^0.2.4",
-    "jimp": "^0.16.1",
-    "link-preview-js": "^2.1.13",
+    "link-preview-js": "^4.0.4",
     "qrcode-terminal": "^0.12.0",
     "sharp": "^0.35.0"
   },
   "peerDependenciesMeta": {
     "@adiwajshing/keyed-db": {
-      "optional": true
-    },
-    "jimp": {
       "optional": true
     },
     "qrcode-terminal": {
@@ -74,6 +70,7 @@
     }
   },
   "overrides": {
+    "@types/babel__traverse": "7.20.6",
     "protobufjs": "$protobufjs"
   },
   "files": [
@@ -84,7 +81,7 @@
   "devDependencies": {
     "@adiwajshing/keyed-db": "^0.2.4",
     "@types/got": "^9.6.11",
-    "@types/jest": "^27.5.1",
+    "@types/jest": "^29.5.14",
     "@types/node": "^16.0.0",
     "@types/sharp": "^0.29.4",
     "@types/ws": "^8.0.0",
@@ -94,15 +91,14 @@
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^9.1.2",
     "eslint-plugin-prettier": "^5.5.4",
-    "jest": "^27.0.6",
-    "jimp": "^0.16.1",
-    "link-preview-js": "^2.1.13",
+    "jest": "^29.7.0",
+    "link-preview-js": "^4.0.4",
     "prettier": "^3.6.2",
     "qrcode-terminal": "^0.12.0",
     "sharp": "^0.35.0",
-    "ts-jest": "^27.0.3",
+    "ts-jest": "^29.4.12",
     "ts-node": "^10.8.1",
-    "typedoc": "^0.22.0",
-    "typescript": "^4.0.0"
+    "typedoc": "^0.22.15",
+    "typescript": "^4.6.4"
   }
 }

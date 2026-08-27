@@ -137,7 +137,7 @@ async function findAppModules() {
   // find all identifiers and, for enums, their array of values
   for (const mod of modules) {
     const modInfo = modulesInfo[mod.expression.arguments[0].value];
-    const rename = makeRenameFunc(mod.expression.arguments[0].value);
+    const rename = makeRenameFunc();
 
     const assignments = [];
     walk.simple(mod, {
@@ -224,7 +224,7 @@ async function findAppModules() {
   // find the contents for all protobuf messages
   for (const mod of modules) {
     const modInfo = modulesInfo[mod.expression.arguments[0].value];
-    const rename = makeRenameFunc(mod.expression.arguments[0].value);
+    const rename = makeRenameFunc();
     const findByAliasInIdentifier = (obj, alias) => {
       return Object.values(obj).find(item => item.alias === alias);
     };
